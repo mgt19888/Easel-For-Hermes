@@ -1,5 +1,6 @@
 """easel ping — 连通性测试（直接运行，不依赖 Docker）。"""
 
+# Modified September 2026: verify Hermes model connectivity.
 from __future__ import annotations
 
 import os
@@ -46,6 +47,19 @@ def _step(label: str, cmd: list[str], timeout: int = 30,
 
 
 def cmd_ping(_args) -> int:
+    from easel.runtime import is_hermes, hermes_command, ROOT
+    if is_hermes():
+        import time
+        try:
+            result = subprocess.run(hermes_command("只回复 PONG，不调用工具。", f"ping-{time.time_ns()}", 60),
+                                    cwd=ROOT, env=_proxy_env(), capture_output=True,
+                                    text=True, timeout=90)
+        except (OSError, subprocess.TimeoutExpired):
+            print("Hermes 无法启动或连接超时；请运行 easel doctor。")
+            return 1
+        ok = result.returncode == 0 and "PONG" in result.stdout
+        print("Hermes: " + ("PONG ✓" if ok else "连接失败；请运行 hermes setup 检查模型配置。"))
+        return 0 if ok else 1
     print("[easel] 连通性测试\n")
     all_ok = True
 

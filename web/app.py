@@ -1,4 +1,5 @@
 """Easel Web — FastAPI 后端（含 SSE 流式输出）."""
+# Modified September 2026: Hermes CLI integration, session lifecycle and status.
 from __future__ import annotations
 
 import asyncio
@@ -36,6 +37,7 @@ if str(PROJECT_ROOT / "scripts") not in sys.path:
 
 from easel.persona import load_profile_text, persona_prefix, chat_turn_message, profile_exists, _FILE_ORDER
 from easel.timeouts import TIMEOUT_CHAT, TIMEOUT_DIRECT, TIMEOUT_PRODUCE
+from easel.runtime import is_hermes, hermes_command, capability_check, hermes_base
 
 PROFILES_DIR = PROJECT_ROOT / "profiles"
 SKILLS_DIR = PROJECT_ROOT / "skills"
@@ -59,6 +61,8 @@ def _heal_openclaw_session(sk: str) -> None:
 
     best-effort：任何异常都不阻断对话（清洗失败大不了退回原样，仍可 /new）。
     """
+    if is_hermes():
+        return
     try:
         import session_heal  # scripts/session_heal.py（已加入 sys.path）
         p = OPENCLAW_SESSIONS_DIR / f"{_openclaw_session_id(sk)}.jsonl"
@@ -442,11 +446,17 @@ def run_agent_sync(msg: str, timeout: int = TIMEOUT_DIRECT, session_id: str | No
            '--timeout', str(timeout), '--message', msg]
     # 跨进程锁：同一会话同时刻只跑一个 openclaw，防并发 takeover 崩溃（rc=1）
     xlock = _CrossProcLock(sk)
+    if is_hermes():
+        cmd = hermes_command(msg, sk, timeout)
     if not xlock.acquire(timeout=min(timeout, 300)):
         return '⏳ 这个会话正在另一个窗口运行，请稍候再试'
     try:
         r = subprocess.run(cmd, capture_output=True, text=True, cwd=str(PROJECT_ROOT), timeout=timeout + 30, env=_proxy_env())
-        return clean_agent_output(r.stdout or '') or '（无输出）'
+        if is_hermes():
+            _record_hermes_session(sk, r.stderr or '')
+        if r.returncode:
+            return f'❌ Agent 执行失败（退出码 {r.returncode}），请运行 easel ping 检查模型配置。'
+        return (r.stdout.strip() if is_hermes() else clean_agent_output(r.stdout or '')) or '（无输出）'
     except subprocess.TimeoutExpired:
         return '⏱️ 请求超时'
     except Exception as e:
@@ -456,6 +466,8 @@ def run_agent_sync(msg: str, timeout: int = TIMEOUT_DIRECT, session_id: str | No
 
 
 def check_gateway() -> bool:
+    if is_hermes():
+        return capability_check()[0]
     try:
         with urllib.request.urlopen('http://127.0.0.1:18789/healthz', timeout=3) as response:
             return response.status == 200
@@ -613,7 +625,8 @@ async def static_file(path: str):
 
 @app.get("/api/status")
 async def api_status():
-    return {"gateway": check_gateway(), "skills": get_skills(), "personas": list_personas()}
+    return {"gateway": check_gateway(), "runtime": "hermes" if is_hermes() else "openclaw",
+            "skills": get_skills(), "personas": list_personas()}
 
 
 @app.get("/api/personas")
@@ -1086,6 +1099,12 @@ async def api_chat_stream(req: ChatRequest):
         env = _proxy_env()
         env["OPENCLAW_RAW_STREAM"] = "1"
         env["OPENCLAW_RAW_STREAM_PATH"] = str(raw_path)
+        hermes_run = is_hermes()
+        if hermes_run:
+            cmd = hermes_command(message, sk, TIMEOUT_CHAT)
+            env.pop("OPENCLAW_RAW_STREAM", None)
+            env.pop("OPENCLAW_RAW_STREAM_PATH", None)
+            to_client("activity", "Hermes 正在处理，完成后显示回复；离开页面后仍会继续运行。")
 
         # 会话级串行：同一会话若已有请求在跑，先提示排队，等它结束再开
         # （否则两个 openclaw 进程并发写同一 session 文件 → 崩溃 rc=1 / 会话串味）。
@@ -1113,7 +1132,7 @@ async def api_chat_stream(req: ChatRequest):
 
         try:
             proc = subprocess.Popen(
-                cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE if hermes_run else subprocess.STDOUT,
                 cwd=str(PROJECT_ROOT), text=True, bufsize=1, env=env,
             )
         except BaseException:
@@ -1215,6 +1234,9 @@ async def api_chat_stream(req: ChatRequest):
                 loop.call_soon_threadsafe(q.put_nowait, SENTINEL)
 
         stdout_fut = loop.run_in_executor(None, _drain_stdout)
+        # Hermes emits session metadata and diagnostics on stderr, not reply text.
+        # Drain independently so a verbose tool cannot block on a full pipe.
+        stderr_fut = loop.run_in_executor(None, lambda: proc.stderr.read()) if hermes_run else None
         loop.run_in_executor(None, _tail)
 
         deadline = time.monotonic() + TIMEOUT_CHAT + 30
@@ -1255,14 +1277,29 @@ async def api_chat_stream(req: ChatRequest):
             except Exception:
                 pass
             sr = run_info.get("stop_reason")
+            if hermes_run:
+                if stderr_fut is not None:
+                    try:
+                        diagnostics = await asyncio.wait_for(stderr_fut, timeout=2)
+                        _record_hermes_session(sk, diagnostics)
+                    except (OSError, asyncio.TimeoutError):
+                        pass
+                if rc == 0 and not timed_out and "".join(stdout_lines).strip():
+                    run_info.update(last_ev="assistant_message_end", saw_message_end=True,
+                                    stop_reason="stop")
+                    sr = "stop"
+                elif rc == 0 and not timed_out:
+                    run_info["stop_reason"] = "empty_response"
+                    to_client("error", "Hermes 未返回回复，请运行 easel ping 检查模型连接。")
             if not emitted:
-                clean = clean_agent_output("".join(stdout_lines))
+                clean = "".join(stdout_lines).strip() if hermes_run and rc == 0 else (
+                    "" if hermes_run else clean_agent_output("".join(stdout_lines)))
                 if clean:
                     emitted = True
                     full_text.append(clean)
                     to_client("token", clean)
                 elif rc not in (0, None):
-                    err = clean_agent_output("".join(stdout_lines))[:200]
+                    err = "请运行 easel ping 检查 Hermes 模型配置" if hermes_run else clean_agent_output("".join(stdout_lines))[:200]
                     to_client("error", f"❌ 执行失败（退出码 {rc}）{' — ' + err if err else ''}")
             # 收尾检测：即使已吐了内容，只要不是「正常收尾」就显式告知——
             # 否则被截断（触顶）/被杀（负载）/流被中断，都会被当成「清晰地答完了」，
@@ -2210,9 +2247,47 @@ def _write_baseline_profile(name: str, form: dict) -> None:
         encoding='utf-8')
 
 
+def _hermes_session_file(key: str) -> Path:
+    scope = json.dumps([hermes_base(), os.environ.get("HERMES_HOME", ""), key])
+    return SESSIONS_DIR / ("hermes-" + hashlib.sha256(scope.encode()).hexdigest() + ".id")
+
+
+def _record_hermes_session(key: str, diagnostics: str) -> None:
+    matches = re.findall(r"(?m)^session_id:\s*([A-Za-z0-9_-]+)\s*$", diagnostics)
+    if matches:
+        path = _hermes_session_file(key)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(matches[-1], encoding="utf-8")
+
+
 @app.delete("/api/session/{session_key}")
 async def api_delete_session(session_key: str):
     """删除 OpenClaw 本地的 session 记录。"""
+    if is_hermes():
+        lock = _session_lock(session_key)
+        if lock.locked() or session_key in _RUNNING_CHAT:
+            raise HTTPException(409, "会话正在运行，请先停止。")
+        sid_path = _hermes_session_file(session_key)
+        if not sid_path.is_file():
+            return {'deleted': False, 'reason': 'Hermes session ID not recorded'}
+        sid = sid_path.read_text(encoding="utf-8").strip()
+        if not re.fullmatch(r"[A-Za-z0-9_-]+", sid):
+            raise HTTPException(400, "Invalid Hermes session ID")
+        async with lock:
+            xlock = _CrossProcLock(session_key)
+            if not await asyncio.to_thread(xlock.acquire, 0):
+                xlock.release()
+                raise HTTPException(409, "会话正在其他进程运行，请先停止。")
+            try:
+                result = await asyncio.to_thread(subprocess.run,
+                    hermes_base() + ["sessions", "delete", sid, "--yes"],
+                    capture_output=True, text=True, timeout=15, env=_proxy_env())
+                if result.returncode:
+                    raise HTTPException(502, "Hermes session deletion failed")
+                sid_path.unlink(missing_ok=True)
+            finally:
+                xlock.release()
+        return {'deleted': True}
     sessions_file = Path.home() / '.openclaw-easel' / 'agents' / 'main' / 'sessions' / 'sessions.json'
     if not sessions_file.is_file():
         return {'deleted': False, 'reason': 'sessions file not found'}

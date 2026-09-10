@@ -8,6 +8,7 @@
     easel skill <name> -i "..." -p <画像>   # 运行 SKILL
 """
 
+# Modified September 2026: route this fork's interactive chat to Hermes.
 from __future__ import annotations
 
 import argparse
@@ -24,6 +25,7 @@ from easel.commands.skill import cmd_skill
 from easel.persona import list_personas as _list_personas
 from easel.persona import persona_prefix
 from easel.timeouts import TIMEOUT_CHAT
+from easel.runtime import is_hermes, hermes_command
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PROFILES_DIR = PROJECT_ROOT / "profiles"
@@ -116,6 +118,9 @@ def cmd_chat(_args) -> int:
     if prefix:
         cmd += ["--message", prefix]
 
+    if is_hermes():
+        cmd = hermes_command(prefix or "请准备好协助社媒内容创作。", session_key,
+                             TIMEOUT_CHAT, interactive=True)
     result = subprocess.run(cmd, cwd=str(PROJECT_ROOT), env=_proxy_env())
 
     return result.returncode
@@ -137,7 +142,7 @@ def main(argv: list[str] | None = None) -> int:
     p_doctor.set_defaults(func=cmd_doctor)
 
     # gateway
-    p_gw = sub.add_parser("gateway", help="管理 OpenClaw gateway")
+    p_gw = sub.add_parser("gateway", help="查看运行时状态（Hermes CLI 无需网关）")
     p_gw.add_argument("action", choices=["start", "stop", "restart", "status", "logs"],
                        default="status", nargs="?")
     p_gw.set_defaults(func=cmd_gateway)

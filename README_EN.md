@@ -1,3 +1,10 @@
+# Easel-For-Hermes
+
+This fork of [ZJU-REAL/Easel](https://github.com/ZJU-REAL/Easel) defaults to Nous Research Hermes Agent.
+See [Hermes setup and limitations](docs/hermes.md). Modified September 2026: runtime integration,
+installers, and status checks. Original Apache-2.0 license and acknowledgments retained.
+The upstream introduction below describes the legacy OpenClaw runtime (`EASEL_RUNTIME=openclaw`).
+
 <p align="left">
   <img src="assets/readme/logos/zhejiang_university_horizontal_readme.png#gh-light-mode-only" width="106" align="middle" alt="Zhejiang University">
   <img src="assets/readme/logos/zhejiang_university_horizontal_dark.png#gh-dark-mode-only" width="106" align="middle" alt="Zhejiang University">

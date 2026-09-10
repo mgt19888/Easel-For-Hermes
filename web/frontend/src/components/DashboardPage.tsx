@@ -1,3 +1,4 @@
+// Modified September 2026: runtime-neutral status for the Hermes edition.
 import { useState, useEffect } from 'react';
 import {
   fetchTrends, fetchSchedule, fetchOutputs, fetchAccounts, fetchIdeas,
@@ -119,7 +120,7 @@ export default function DashboardPage({ persona, gatewayStatus, onNavigate, onUs
       <div className="dash-hero">
         <h1 className="page-title" style={{ fontSize: 26 }}>{greet} 👋</h1>
         <p className="page-subtitle">
-          {gatewayStatus === 'connected' ? '一切就绪。' : '⚠ 网关未连接。'}
+          {gatewayStatus === 'connected' ? '运行时可用。' : '⚠ 运行时未就绪，请运行 easel doctor。'}
           {persona ? ` 当前画像「${persona}」。` : ' 通用模式——指定画像效果更好。'}
           从热点到发布，一站式搞定今天的内容。
         </p>

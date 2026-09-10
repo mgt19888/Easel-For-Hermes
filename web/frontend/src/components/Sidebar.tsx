@@ -1,3 +1,4 @@
+// Modified September 2026: runtime-neutral status for the Hermes edition.
 import { useState } from 'react';
 import type { ChatSession } from '../lib/store';
 import type { PersonaItem } from '../lib/api';
@@ -169,9 +170,9 @@ export default function Sidebar({
       <div className="sidebar-status">
         <span className={`status-dot ${gatewayStatus === 'connected' ? '' : 'offline'}`} />
         {gatewayStatus === 'connected'
-          ? '网关已连接'
+          ? '运行时可用'
           : gatewayStatus === 'disconnected'
-            ? '网关离线'
+            ? '运行时未就绪'
             : '连接中…'}
         <span style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--text-tertiary)' }}>subnav-1</span>
       </div>

@@ -1,5 +1,10 @@
 $ErrorActionPreference = 'Stop'
 $Root = (Resolve-Path (Split-Path -Parent $MyInvocation.MyCommand.Path)).Path
+# Modified September 2026: default to the Hermes edition.
+if (-not $env:EASEL_RUNTIME -or $env:EASEL_RUNTIME -eq 'hermes') {
+    & python (Join-Path $Root 'scripts/setup_hermes.py')
+    exit $LASTEXITCODE
+}
 $Venv = Join-Path $Root '.venv'
 $Python = Join-Path $Venv 'Scripts\python.exe'
 $env:PYTHONUTF8 = '1'

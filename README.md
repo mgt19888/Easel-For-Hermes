@@ -1,3 +1,17 @@
+# Easel-For-Hermes
+
+基于 [ZJU-REAL/Easel](https://github.com/ZJU-REAL/Easel) 二次开发，默认使用 **Nous Research Hermes Agent**。
+本分支的安装、配置和已知限制请看 [Hermes 接入说明](docs/hermes.md)。
+2026-09 修改了 Web/CLI 运行时、安装入口和状态检查。原 Apache-2.0 许可证与致谢保留。
+先安装并配置 Hermes（`hermes setup`），再运行：
+
+```bash
+bash setup.sh
+.venv/bin/python -m easel web
+```
+
+下面保留上游项目介绍，其中 OpenClaw 安装说明仅适用于 `EASEL_RUNTIME=openclaw`。
+
 <p align="left">
   <img src="assets/readme/logos/zhejiang_university_horizontal_readme.png#gh-light-mode-only" width="106" align="middle" alt="Zhejiang University">
   <img src="assets/readme/logos/zhejiang_university_horizontal_dark.png#gh-dark-mode-only" width="106" align="middle" alt="Zhejiang University">

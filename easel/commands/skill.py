@@ -10,6 +10,7 @@
     easel skill produce-shortdrama -i "30秒短剧需求"
 """
 
+# Modified September 2026: route local skills through Hermes.
 from __future__ import annotations
 
 import os
@@ -100,6 +101,9 @@ def _run_via_openclaw(message: str, timeout: int = 300) -> int:
         "--message", message,
     ]
 
+    from easel.runtime import is_hermes, hermes_command
+    if is_hermes():
+        cmd = hermes_command(message, session_key, timeout)
     try:
         result = subprocess.run(cmd, capture_output=True, text=True,
                                 cwd=str(PROJECT_ROOT), timeout=timeout + 30,

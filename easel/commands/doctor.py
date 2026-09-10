@@ -1,5 +1,6 @@
 """easel doctor — 检查开发环境是否就绪。"""
 
+# Modified September 2026: add Hermes runtime diagnostics.
 from __future__ import annotations
 
 import os
@@ -141,6 +142,9 @@ def _env_key_valid() -> bool:
 
 
 def cmd_doctor(_args) -> int:
+    from easel.runtime import is_hermes, doctor
+    if is_hermes():
+        return doctor()
     print("Easel — 环境检查\n")
     all_ok = True
 

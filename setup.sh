@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Modified September 2026: Hermes is the default runtime for this fork.
+if [ "${EASEL_RUNTIME:-hermes}" = "hermes" ]; then
+    exec python3 "$(cd "$(dirname "$0")" && pwd)/scripts/setup_hermes.py"
+fi
+
 # ============================================================
 # Easel 一键安装
 # 用法: git clone <repo> && cd Easel && bash setup.sh

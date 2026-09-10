@@ -9,6 +9,8 @@ build/
 .eggs/
 
 # Environment
+# Modified September 2026: keep the Hermes edition's local venv out of Git.
+.venv/
 .env
 .env.local
 .env.xhs
