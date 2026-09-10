@@ -1,16 +1,56 @@
-# Easel-For-Hermes
+# Easel-For-Hermes · Easel 的 Hermes Agent 适配版
 
-基于 [ZJU-REAL/Easel](https://github.com/ZJU-REAL/Easel) 二次开发，默认使用 **Nous Research Hermes Agent**。
-本分支的安装、配置和已知限制请看 [Hermes 接入说明](docs/hermes.md)。
-2026-09 修改了 Web/CLI 运行时、安装入口和状态检查。原 Apache-2.0 许可证与致谢保留。
-先安装并配置 Hermes（`hermes setup`），再运行：
+[English](README_EN.md) · [适配详情与配置](docs/hermes.md) · [原项目 Easel](https://github.com/ZJU-REAL/Easel)
+
+> **本仓库是基于 ZJU-REAL/Easel 二次开发的 Hermes Agent 适配版。**
+> 原项目通过 OpenClaw 运行 Agent；本版默认通过 **Nous Research Hermes Agent** 执行网页对话、CLI 对话、技能调用和画像生成。
+> 这是对原有 Easel 工作台的运行时适配，不是 Hermes 模型仓库，也不是从零开发的独立工作台。
+
+## 适配了哪些部分
+
+| 部分 | 本版行为 |
+| --- | --- |
+| Web 对话与画像生成 | 调用 Hermes 公共 CLI |
+| 命令行对话、技能执行 | 默认使用 Hermes |
+| 多轮会话 | 按项目和会话映射到 Hermes，支持续聊 |
+| 网页任务管理 | 保留排队、停止、超时、断线恢复 |
+| 安装与环境检查 | 默认走 Hermes 安装入口，无需启动 OpenClaw 网关 |
+| 素材制作、发布脚本、账号画像 | 复用上游 Easel 实现 |
+
+**适配边界：** 当前使用 Hermes CLI 的最终回复输出，网页尚无逐 token 流式输出；保留的 `skills/openclaw/` 是兼容目录名，部分技能仍可能需要逐项适配。平台登录、真实发布和 Windows 安装尚未完成端到端验证。OpenClaw 旧会话历史不会自动迁移。
+
+已验证：67 项自动测试、前端构建、真实 Hermes 模型调用、Web 两轮续聊和测试会话删除。详见 [验证记录](docs/hermes.md#验证记录)。
+
+## 快速开始
+
+先按 [Hermes 官方说明](https://hermes-agent.nousresearch.com/docs/) 安装 Hermes Agent，并运行 `hermes setup` 配置模型。环境还需 Python >= 3.10、Node.js >= 22.19 和 FFmpeg。
 
 ```bash
+git clone https://github.com/mgt19888/Easel-For-Hermes.git
+cd Easel-For-Hermes
 bash setup.sh
+.venv/bin/python -m easel doctor
 .venv/bin/python -m easel web
 ```
 
-下面保留上游项目介绍，其中 OpenClaw 安装说明仅适用于 `EASEL_RUNTIME=openclaw`。
+打开 http://localhost:7860。默认复用当前 Hermes 模型配置；指定 Hermes profile、模型或 provider 的方法见 [配置说明](docs/hermes.md#配置)。媒体服务的 Key 仍在项目 `.env` 中配置。
+
+## 为什么仓库比较大
+
+本版保留了上游的演示视频、图片与提交历史。2026-09-11 统计，当前版本按 Git 对象去重后：视频约 **286 MiB**、图片约 **18 MiB**、其余代码与文档等约 **4.4 MiB**；Git 压缩包连同历史约 **318 MiB**。实际检出文件因相同素材位于多个路径，合计约 **444 MiB**。
+
+这些大文件主要位于 `assets/readme/videos/` 和 `web/static/showcase/`，不是 Hermes 模型权重，也不是本次适配新增的依赖包。当前版本尚未精简上游演示素材。
+
+## 原项目与许可证
+
+感谢 [ZJU-REAL/Easel](https://github.com/ZJU-REAL/Easel) 原作者、REAL Lab、OpenDCAI Lab 及上游贡献者。本仓库是第三方适配版，不代表原项目团队或 Nous Research 官方发布。
+
+保留原 [Apache-2.0 许可证](LICENSE) 与 [第三方致谢及来源](docs/ACKNOWLEDGMENTS.md)。2026-09 的适配改动包括运行时接入、安装入口、状态检查、测试和文档。
+
+<details>
+<summary>上游 Easel 原始介绍与演示（OpenClaw 版，仅供参考）</summary>
+
+以下为保留的上游资料，其中安装命令、OpenClaw 标识和功能声明描述的是原项目。本版请以上方 Hermes 适配说明为准。
 
 <p align="left">
   <img src="assets/readme/logos/zhejiang_university_horizontal_readme.png#gh-light-mode-only" width="106" align="middle" alt="Zhejiang University">
@@ -410,3 +450,5 @@ Easel 的技能体系和工作流受益于许多优秀的开源项目、工具�
     <img src="https://api.star-history.com/svg?repos=ZJU-REAL/Easel&type=Date" width="720" alt="Easel Star History Chart">
   </a>
 </p>
+
+</details>

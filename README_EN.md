@@ -1,9 +1,53 @@
-# Easel-For-Hermes
+# Easel-For-Hermes · Hermes Agent adaptation of Easel
 
-This fork of [ZJU-REAL/Easel](https://github.com/ZJU-REAL/Easel) defaults to Nous Research Hermes Agent.
-See [Hermes setup and limitations](docs/hermes.md). Modified September 2026: runtime integration,
-installers, and status checks. Original Apache-2.0 license and acknowledgments retained.
-The upstream introduction below describes the legacy OpenClaw runtime (`EASEL_RUNTIME=openclaw`).
+[简体中文](README.md) · [Setup and limitations](docs/hermes.md) · [Original Easel](https://github.com/ZJU-REAL/Easel)
+
+> **This is a third-party Hermes Agent adaptation of ZJU-REAL/Easel.**
+> Upstream uses OpenClaw; this edition defaults to **Nous Research Hermes Agent** for Web chat, CLI chat, skill execution, and profile generation.
+> It adapts Easel's existing workspace. It is not a Hermes model distribution or an independently built workspace.
+
+## Adaptation scope
+
+- Hermes public CLI powers Web chat, CLI chat, skill execution, and profile generation.
+- Project-scoped named sessions support conversation continuity.
+- Web task queuing, cancellation, timeouts, and disconnect recovery remain available.
+- Installers and diagnostics default to Hermes; an OpenClaw gateway is not required.
+- Media scripts, publishing workflows, and account profiles reuse upstream Easel.
+
+**Limitations:** replies appear after Hermes finishes; token-by-token streaming is not implemented. The legacy `skills/openclaw/` directory remains for path compatibility, and individual skills may still need adaptation. Platform login, real publishing, and Windows installation have not been verified end to end. OpenClaw chat history is not automatically migrated.
+
+Verified: 67 automated tests, frontend production build, a live Hermes model call, two-turn Web conversation continuity, and test-session deletion.
+
+## Quick start
+
+Install [Hermes Agent](https://hermes-agent.nousresearch.com/docs/) and configure a model with `hermes setup`. Also install Python >= 3.10, Node.js >= 22.19, and FFmpeg.
+
+```bash
+git clone https://github.com/mgt19888/Easel-For-Hermes.git
+cd Easel-For-Hermes
+bash setup.sh
+.venv/bin/python -m easel doctor
+.venv/bin/python -m easel web
+```
+
+Open http://localhost:7860. See [configuration details](docs/hermes.md) for Hermes profile/model overrides and media service keys.
+
+## Repository size
+
+Upstream demo media and Git history are retained. As of 2026-09-11, unique Git blobs in the current version contain approximately **286 MiB of video**, **18 MiB of images**, and **4.4 MiB of other files including code and documentation**. The compressed Git pack with history is approximately **318 MiB**. The checked-out files total about **444 MiB** because some media appears at multiple paths.
+
+Most large files are in `assets/readme/videos/` and `web/static/showcase/`. They are upstream examples, not Hermes model weights or dependencies added by this adaptation.
+
+## Attribution and license
+
+Based on [ZJU-REAL/Easel](https://github.com/ZJU-REAL/Easel), with thanks to the original authors, REAL Lab, OpenDCAI Lab, and upstream contributors. This is a third-party adaptation, not an official release from the upstream team or Nous Research.
+
+The original [Apache-2.0 license](LICENSE) and [third-party acknowledgments](docs/ACKNOWLEDGMENTS.md) are retained. September 2026 changes cover runtime integration, installers, diagnostics, tests, and documentation.
+
+<details>
+<summary>Original upstream introduction and demos (OpenClaw edition, reference only)</summary>
+
+The following archived upstream material describes the original project. Use the Hermes instructions above for this edition.
 
 <p align="left">
   <img src="assets/readme/logos/zhejiang_university_horizontal_readme.png#gh-light-mode-only" width="106" align="middle" alt="Zhejiang University">
@@ -298,3 +342,5 @@ Contributions and discussion are welcome. If you have ideas, questions, or impro
     <img src="https://api.star-history.com/svg?repos=ZJU-REAL/Easel&type=Date" width="720" alt="Easel Star History Chart">
   </a>
 </p>
+
+</details>
