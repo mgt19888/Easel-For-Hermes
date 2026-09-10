@@ -1,6 +1,6 @@
 # Easel-For-Hermes · Easel 的 Hermes Agent 适配版
 
-[English](README_EN.md) · [适配详情与配置](docs/hermes.md) · [原项目 Easel](https://github.com/ZJU-REAL/Easel)
+[English](README_EN.md) · [适配详情与配置](docs/hermes.md) · [GitHub 能力接入审查](docs/github-integration-review.md) · [原项目 Easel](https://github.com/ZJU-REAL/Easel)
 
 > **本仓库是基于 ZJU-REAL/Easel 二次开发的 Hermes Agent 适配版。**
 > 原项目通过 OpenClaw 运行 Agent；本版默认通过 **Nous Research Hermes Agent** 执行网页对话、CLI 对话、技能调用和画像生成。
@@ -37,9 +37,15 @@ bash setup.sh
 
 ## 为什么仓库比较大
 
-本版保留了上游的演示视频、图片与提交历史。2026-09-11 统计，当前版本按 Git 对象去重后：视频约 **286 MiB**、图片约 **18 MiB**、其余代码与文档等约 **4.4 MiB**；Git 压缩包连同历史约 **318 MiB**。实际检出文件因相同素材位于多个路径，合计约 **444 MiB**。
+2026-09-11 已移除 36 个上游演示视频文件，保留代码、图片和文档；Hermes 适配及视频制作、发布功能不受此次素材清理影响。
 
-这些大文件主要位于 `assets/readme/videos/` 和 `web/static/showcase/`，不是 Hermes 模型权重，也不是本次适配新增的依赖包。当前版本尚未精简上游演示素材。
+旧提交仍包含视频，因此完整 Git 历史仍较大。只获取当前轻量版本可下载 GitHub ZIP，或浅克隆：
+
+```bash
+git clone --depth 1 https://github.com/mgt19888/Easel-For-Hermes.git
+```
+
+本次未重写已发布的提交历史；被移除的演示素材可从旧提交恢复。
 
 ## 原项目与许可证
 
@@ -94,10 +100,6 @@ bash setup.sh
 Easel 是一个面向社交媒体创作者的开源内容工作台。它把 OpenClaw Agent、账号画像、内容技能和真实的媒体工具接在一起，让 Agent 不只回答“应该怎么做”，而是直接把内容做出来并归档，且可实现直接/按需发布。
 
 你可以把它理解成一个会记住你的内容搭档：它了解账号定位、受众、风格、平台限制和历史表现，从热点发现一直陪你做到发布，再把结果带回下一次创作。
-
-Easel 宣传演示：
-
-https://github.com/user-attachments/assets/4dd060dc-53dd-4bb2-99a3-e65ab6f65166
 
 Easel 围绕五个连续工作流展开：**发现**适合账号的热点与机会，**策划**选题、标题、脚本和排期，
 **创作**图文、音频与视频内容，**发布**经过检查和平台适配的成品直接到对应平台，再通过**归因**分析表现并把有效经验沉淀回账号画像。
@@ -170,8 +172,8 @@ Easel 围绕五个连续工作流展开：**发现**适合账号的热点与机�
 ## 🖼️ 真实产物
 
 这些文件来自 Easel 的实际工作流，主页中也有同一批案例的分类展示。
-README 的品牌图、海报、案例图片和视频统一保存在 `assets/readme/`；产品主页使用独立的
-`web/static/showcase/` 素材，其中视频保持为 6 秒轻量预览。
+README 的品牌图、海报、案例图片保存在 `assets/readme/`；产品主页图片位于
+`web/static/showcase/`。本适配版已移除演示视频。
 
 ### 📚 论文解读与知识卡片
 
@@ -216,38 +218,6 @@ README 的品牌图、海报、案例图片和视频统一保存在 `assets/read
   <img src="assets/readme/showcase/jokes-cards-strip-wide.jpg" width="49%" alt="开学趣事梗卡">
 </p>
 <p align="center"><sub>城市生活　/　梗内容</sub></p>
-
-### 🎬 视频成片
-
-为便于快速浏览，这里使用可点击的视频封面。点击封面查看最长 1 分钟的轻量预览，点击封面下方的标题
-查看完整成片。
-
-**论文解读视频**
-
-<p align="center">
-  <a href="assets/readme/videos/preview/spatialladder-explainer.mp4"><img src="assets/readme/videos/thumbnails/spatialladder-explainer.jpg" width="49%" alt="播放 SpatialLadder 论文解读预览"></a>
-  <a href="assets/readme/videos/preview/culture-mt-explainer.mp4"><img src="assets/readme/videos/thumbnails/culture-mt-explainer.jpg" width="49%" alt="播放 CULTURE-MT 论文解读预览"></a>
-</p>
-<p align="center"><sub>▶ 点击封面播放预览 · 查看完整视频：<a href="assets/readme/videos/full/spatialladder-explainer.mp4">SpatialLadder</a>　/　<a href="assets/readme/videos/full/culture-mt-explainer.mp4">CULTURE-MT</a></sub></p>
-
-**口播、连续剧与 AI 角色短视频**
-
-<p align="center">
-  <a href="assets/readme/videos/preview/ordinary-person.mp4"><img src="assets/readme/videos/thumbnails/ordinary-person.jpg" width="24%" alt="播放普通人口播剧预览"></a>
-  <a href="assets/readme/videos/preview/hanako-change.mp4"><img src="assets/readme/videos/thumbnails/hanako-change.jpg" width="24%" alt="播放花子的转变预览"></a>
-  <a href="assets/readme/videos/preview/cyber-cultivation.mp4"><img src="assets/readme/videos/thumbnails/cyber-cultivation.jpg" width="24%" alt="播放赛博修仙预览"></a>
-  <a href="assets/readme/videos/preview/cyber-turtle.mp4"><img src="assets/readme/videos/thumbnails/cyber-turtle.jpg" width="24%" alt="播放赛博吃播甲鱼预览"></a>
-</p>
-<p align="center"><sub>▶ 点击封面播放预览 · 查看完整视频：<a href="assets/readme/videos/full/ordinary-person.mp4">普通人</a>　/　<a href="assets/readme/videos/full/hanako-change.mp4">花子的转变</a>　/　<a href="assets/readme/videos/full/cyber-cultivation.mp4">赛博修仙</a>　/　<a href="assets/readme/videos/full/cyber-turtle.mp4">赛博吃播甲鱼</a></sub></p>
-
-**氛围影像与横版内容**
-
-<p align="center">
-  <a href="assets/readme/videos/preview/jilong-news.mp4"><img src="assets/readme/videos/thumbnails/jilong-news.jpg" width="32%" alt="播放西藏吉隆泥石流预览"></a>
-  <a href="assets/readme/videos/preview/daomu-book.mp4"><img src="assets/readme/videos/thumbnails/daomu-book.jpg" width="32%" alt="播放盗墓笔记小说介绍预览"></a>
-  <a href="assets/readme/videos/preview/zju-intro.mp4"><img src="assets/readme/videos/thumbnails/zju-intro.jpg" width="32%" alt="播放浙江大学介绍预览"></a>
-</p>
-<p align="center"><sub>▶ 点击封面播放预览 · 查看完整视频：<a href="assets/readme/videos/full/jilong-news.mp4">西藏吉隆泥石流</a>　/　<a href="assets/readme/videos/full/daomu-book.mp4">盗墓笔记小说介绍</a>　/　<a href="assets/readme/videos/full/zju-intro.mp4">浙江大学</a></sub></p>
 
 ## 🚀 快速开始
 

@@ -34,9 +34,15 @@ Open http://localhost:7860. See [configuration details](docs/hermes.md) for Herm
 
 ## Repository size
 
-Upstream demo media and Git history are retained. As of 2026-09-11, unique Git blobs in the current version contain approximately **286 MiB of video**, **18 MiB of images**, and **4.4 MiB of other files including code and documentation**. The compressed Git pack with history is approximately **318 MiB**. The checked-out files total about **444 MiB** because some media appears at multiple paths.
+On 2026-09-11, 36 upstream demo video files were removed. Code, images, documentation, and the existing video creation/publishing functionality remain.
 
-Most large files are in `assets/readme/videos/` and `web/static/showcase/`. They are upstream examples, not Hermes model weights or dependencies added by this adaptation.
+Older commits still contain the videos, so a full clone retains the large history. Download the current GitHub ZIP or use a shallow clone for the lighter version:
+
+```bash
+git clone --depth 1 https://github.com/mgt19888/Easel-For-Hermes.git
+```
+
+Published history has not been rewritten. Removed demo assets can be recovered from older commits.
 
 ## Attribution and license
 
@@ -92,10 +98,6 @@ Easel is an open-source content workspace for social media creators. It connects
 
 Think of Easel as a content partner that remembers your positioning, audience, voice, platform constraints, preferences, and past performance. It stays with you from trend discovery through publishing, then carries what it learns into the next creation cycle.
 
-Easel promotional demo:
-
-https://github.com/user-attachments/assets/4dd060dc-53dd-4bb2-99a3-e65ab6f65166
-
 Easel follows five connected workflows: **Discover** relevant trends and opportunities, **Plan** topics, hooks, scripts, and schedules, **Produce** text, audio, and video, **Publish** checked and platform-ready content directly to the appropriate platforms, and **Attribute** performance insights back to the account profile.
 
 #### 📌 Usage Notes and Research Vision
@@ -148,7 +150,7 @@ These are four representative examples, not the complete feature set. Explore th
 
 ## 🖼️ Real Outputs
 
-The following examples were produced by real Easel workflows. README media lives under `assets/readme/`; the project page uses lightweight six-second previews under `web/static/showcase/`.
+The following examples were produced by real Easel workflows. README images live under `assets/readme/`; project-page images are under `web/static/showcase/`. Demo videos have been removed from this adaptation.
 
 ### 📚 Paper Explainers and Knowledge Cards
 
@@ -180,31 +182,6 @@ The following examples were produced by real Easel workflows. README media lives
   <img src="assets/readme/showcase/life-chengdu-cards-strip.jpg" width="49%" alt="Chengdu lifestyle cards">
   <img src="assets/readme/showcase/jokes-cards-strip-wide.jpg" width="49%" alt="Meme cards">
 </p>
-
-### 🎬 Finished Videos
-
-For faster browsing, each cover opens a lightweight preview of up to one minute. Use the links beneath each row for the full videos.
-
-<p align="center">
-  <a href="assets/readme/videos/preview/spatialladder-explainer.mp4"><img src="assets/readme/videos/thumbnails/spatialladder-explainer.jpg" width="49%" alt="Play SpatialLadder preview"></a>
-  <a href="assets/readme/videos/preview/culture-mt-explainer.mp4"><img src="assets/readme/videos/thumbnails/culture-mt-explainer.jpg" width="49%" alt="Play CULTURE-MT preview"></a>
-</p>
-<p align="center"><sub>Full videos: <a href="assets/readme/videos/full/spatialladder-explainer.mp4">SpatialLadder</a> · <a href="assets/readme/videos/full/culture-mt-explainer.mp4">CULTURE-MT</a></sub></p>
-
-<p align="center">
-  <a href="assets/readme/videos/preview/ordinary-person.mp4"><img src="assets/readme/videos/thumbnails/ordinary-person.jpg" width="24%" alt="Play Ordinary Person preview"></a>
-  <a href="assets/readme/videos/preview/hanako-change.mp4"><img src="assets/readme/videos/thumbnails/hanako-change.jpg" width="24%" alt="Play Hanako preview"></a>
-  <a href="assets/readme/videos/preview/cyber-cultivation.mp4"><img src="assets/readme/videos/thumbnails/cyber-cultivation.jpg" width="24%" alt="Play cyber cultivation preview"></a>
-  <a href="assets/readme/videos/preview/cyber-turtle.mp4"><img src="assets/readme/videos/thumbnails/cyber-turtle.jpg" width="24%" alt="Play cyber turtle preview"></a>
-</p>
-<p align="center"><sub>Full videos: <a href="assets/readme/videos/full/ordinary-person.mp4">Ordinary Person</a> · <a href="assets/readme/videos/full/hanako-change.mp4">Hanako's Change</a> · <a href="assets/readme/videos/full/cyber-cultivation.mp4">Cyber Cultivation</a> · <a href="assets/readme/videos/full/cyber-turtle.mp4">Cyber Turtle Mukbang</a></sub></p>
-
-<p align="center">
-  <a href="assets/readme/videos/preview/jilong-news.mp4"><img src="assets/readme/videos/thumbnails/jilong-news.jpg" width="32%" alt="Play Jilong news preview"></a>
-  <a href="assets/readme/videos/preview/daomu-book.mp4"><img src="assets/readme/videos/thumbnails/daomu-book.jpg" width="32%" alt="Play Daomu Biji preview"></a>
-  <a href="assets/readme/videos/preview/zju-intro.mp4"><img src="assets/readme/videos/thumbnails/zju-intro.jpg" width="32%" alt="Play Zhejiang University preview"></a>
-</p>
-<p align="center"><sub>Full videos: <a href="assets/readme/videos/full/jilong-news.mp4">Jilong Landslide News</a> · <a href="assets/readme/videos/full/daomu-book.mp4">Daomu Biji Introduction</a> · <a href="assets/readme/videos/full/zju-intro.mp4">Zhejiang University</a></sub></p>
 
 ## 🚀 Quick Start
 

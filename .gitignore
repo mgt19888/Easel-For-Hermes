@@ -43,6 +43,9 @@ assets/**/*
 !assets/icon-noword.png
 !assets/readme/
 !assets/readme/**
+# Demo videos removed from the Hermes edition, September 2026.
+assets/readme/**/*.mp4
+web/static/showcase/**/*.mp4
 
 # Session files
 *.jsonl
